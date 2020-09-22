@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TD2</string>
+    <string name="mdp">mot de passe</string>
+    <string name="ok">OK</string>
+    <string name="annuler">Annuler</string>
+    <string name="annulerTout">Annuler Tout</string>
+</resources>
