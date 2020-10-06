@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">TD2</string>
+    <string name="Slt">Salut tout le monde</string>
+    <string name="ok">OK</string>
+    <string name="annuler">Annuler</string>
+    <string name="annuler_tout">Annuler tout</string>
+    <string name="mdp">Mot de Passe</string>
+    <string name="btn1">BTN1</string>
+    <string name="btn2">BTN2</string>
+    <string name="btn3">BTN3</string>
+    <string name="btn4">BTN4</string>
+    <string name="btn5">BTN5</string>
+    <string name="entree">Entrée</string>
+    <string name="plat">Plat principal</string>
+    <string name="fromage">Fromage</string>
+    <string name="fruit">Fruit</string>
+    <string name="midi">Midi</string>
+    <string name="soir">Soir</string>
+    <string name="valider">Valider le repas</string>
+    <string name="saisie_repas">Saisie de Repas</string>
+    <string name="releve">Relevé météorologique</string>
+    <string name="temperature">Température (°C)</string>
+    <string name="vitesse">Vitesse du vent en km/h</string>
+    <string-array name="ciel">
+        <item>"Dégagé"</item>
+        <item>"Couvert"</item>
+        <item>"Pluvieux"</item>
+    </string-array>
+</resources>
