@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
+import com.example.newslist.NewsListActivity.Companion.local
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,9 +18,9 @@ class LoginActivity : AppCompatActivity() {
         login.setOnClickListener(){
             val editLogin = findViewById<EditText>(R.id.loginText)
             val textLogin = editLogin.text.toString()
-
+            local = textLogin
             val intent = Intent(this, NewsActivity::class.java)
-            intent.putExtra("login", textLogin)
+            //intent.putExtra("login", textLogin)
             startActivity(intent)
             finish()
         }

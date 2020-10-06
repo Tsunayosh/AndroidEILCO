@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.newslist.NewsListActivity.Companion.local
 
 class NewsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,11 +38,13 @@ class NewsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        val intent = intent
-        val textLogin = findViewById<TextView>(R.id.textLoginNews)
-        if (intent.hasExtra("login")) {
-           textLogin.text  = intent.getStringExtra("login")
-        }
+        //val intent = intent
+        var textLogin = findViewById<TextView>(R.id.textLoginNews)
+        textLogin.text = local.toString()
+        /*if (intent.hasExtra("login")) {
+           //textLogin.text  = intent.getStringExtra("login")
+        }*/
+
 
 
     }
