@@ -2,6 +2,7 @@ package com.example.tp5
 
 import android.content.Context
 import android.icu.number.NumberFormatter.with
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ class ContactAdapter(val mContacts : List<Contact>, val context: Context):Recycl
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        Log.d("check", mContacts.size.toString())
         val contact = mContacts[position]
         val firstNameTextView = holder.firstNameTextView
         firstNameTextView.text = contact.prenom
@@ -37,13 +39,8 @@ class ContactAdapter(val mContacts : List<Contact>, val context: Context):Recycl
     }
 
     class ViewHolder(itemView: View):RecyclerView.ViewHolder(itemView) {
-        var firstNameTextView : TextView
-        var lastNameTextView : TextView
-        var image : ImageView
-        init{
-            firstNameTextView = itemView.findViewById(R.id.prenom) as TextView
-            lastNameTextView = itemView.findViewById(R.id.nom) as TextView
-            image = itemView.findViewById(R.id.imageURL) as ImageView
-        }
+        var firstNameTextView : TextView = itemView.findViewById(R.id.prenom) as TextView
+        var lastNameTextView : TextView = itemView.findViewById(R.id.nom) as TextView
+        var image : ImageView = itemView.findViewById(R.id.imageURL) as ImageView
     }
 }

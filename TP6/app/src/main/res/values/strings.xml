@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">TP6</string>
+    <string name="ok">OK</string>
+    <string name="nom_de_repo">Nom de repo</string>
+</resources>

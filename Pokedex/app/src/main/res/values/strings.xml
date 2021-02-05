@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Pokedex</string>
+    <string name="gen1">Gen.1</string>
+    <string name="gen2">Gen.2</string>
+    <string name="gen3">Gen.3</string>
+    <string name="gen4">Gen.4</string>
+    <string name="gen5">Gen.5</string>
+    <string name="gen6">Gen.6</string>
+    <string name="gen7">Gen.7</string>
+    <string name="gen8">Gen.8</string>
+    <string name="bottom_nav_description">Description</string>
+    <string name="bottom_nav_evolve">Evolution</string>
+    <string name="Pokedex">Pokedex</string>
+    <string name="taille">Taille</string>
+    <string name="poids">Poids</string>
+    <string name="type">Types</string>
+</resources>
