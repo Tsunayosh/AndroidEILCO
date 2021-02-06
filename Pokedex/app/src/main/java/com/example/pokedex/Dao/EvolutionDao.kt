@@ -13,7 +13,7 @@ interface EvolutionDao {
     @Query("SELECT * FROM evolution WHERE name LIKE :name ")
     fun findEvolutionByName(name : String): EvolutionPokemon
 
-    @Query("SELECT * FROM evolution WHERE id = :id ")
+    @Query("SELECT * FROM evolution WHERE number = :id ")
     fun findEvolutionByID(id : Int): EvolutionPokemon
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

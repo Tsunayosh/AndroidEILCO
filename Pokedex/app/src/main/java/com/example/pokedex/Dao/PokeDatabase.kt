@@ -7,7 +7,7 @@ import com.example.pokedex.Models.EvolutionPokemon
 import com.example.pokedex.Models.Pokemon
 import com.example.pokedex.Models.PokemonSpecies
 
-@Database(entities = [Pokemon::class, DetailsPoke::class, PokemonSpecies::class, EvolutionPokemon::class], version = 6)
+@Database(entities = [Pokemon::class, DetailsPoke::class, PokemonSpecies::class, EvolutionPokemon::class], version = 7)
 abstract class PokeDatabase : RoomDatabase() {
     abstract fun pokemonDao(): PokemonDao
     abstract fun datailsDao(): DetailsDao

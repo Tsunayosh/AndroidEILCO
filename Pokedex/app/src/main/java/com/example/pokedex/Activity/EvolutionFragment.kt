@@ -1,6 +1,5 @@
 package com.example.pokedex.Activity
 
-import com.example.pokedex.R
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -15,17 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import com.bumptech.glide.Glide
 import com.example.pokedex.Adapter.PokedexAdapter
-import com.example.pokedex.Dao.DetailsDao
-import com.example.pokedex.Dao.PokeDatabase
-import com.example.pokedex.Dao.SpeciesDao
+import com.example.pokedex.Dao.*
 import com.example.pokedex.Models.DetailsPoke
+import com.example.pokedex.Models.EvolutionPokemon
 import com.example.pokedex.Models.Pokemon
 import com.example.pokedex.Models.PokemonSpecies
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.pokedex.R
 
 
 class EvolutionFragment : Fragment() {
@@ -34,15 +28,19 @@ class EvolutionFragment : Fragment() {
     private var mapType: HashMap<String, String> = HashMap()
     private var back: ImageView? = null
     private var newId: String? = null
-    private var number: TextView? = null
     private var img: ImageView? = null
     private var rvPoke: RecyclerView? = null
     private var mPokedexAdapter: PokedexAdapter? = null
     private var list: List<Pokemon>? = null
     private lateinit var detailsDao: DetailsDao
     private lateinit var speciesDao: SpeciesDao
+    private lateinit var pokemonDao: PokemonDao
+    private lateinit var evolutionDao : EvolutionDao
     private var details : DetailsPoke? = null
     private var species : PokemonSpecies? = null
+    private var pokemon : Pokemon? = null
+    private var evolution : EvolutionPokemon? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,9 +51,12 @@ class EvolutionFragment : Fragment() {
         val db = Room.databaseBuilder(requireContext(), PokeDatabase::class.java, "poke-database").allowMainThreadQueries().build()
         detailsDao = db.datailsDao()
         speciesDao = db.speciesDao()
+        pokemonDao = db.pokemonDao()
+        evolutionDao = db.evolutionDao()
         val id: Int? = this.arguments?.getString("id")?.toInt()
         details = detailsDao.findDetailsByID(id!!.toInt())
         species = speciesDao.findSpeciesByID(id.toInt())
+        evolution = evolutionDao.findEvolutionByID(id.toInt())
         makeMapType()
 
         img = view.findViewById(R.id.myPoke_img_evolve) as ImageView
@@ -89,21 +90,33 @@ class EvolutionFragment : Fragment() {
         }
         index!!.text = newId
 
-        var nom = ""
-        if (id < 494) {
+        val nom: String
+        nom = if (id < 494) {
             val splitName: List<String> = species!!.namesList?.split("/")!!
-            nom = splitName[8]
+            splitName[8]
         }else{
             val splitName: List<String> = species!!.namesList?.split("/")!!
-            nom = splitName[6]
+            splitName[6]
         }
         name?.text = nom
 
+        val tempEvolutionList = evolution?.familyList?.split("/")
+        Log.e("Check taille", tempEvolutionList?.size.toString())
+        val tempPokeMutableList = mutableListOf<Pokemon>()
+        tempEvolutionList?.forEach {
+            if (it != "") {
+                pokemon = pokemonDao.findByName(it)
+                Log.e("Check evo", pokemon!!.id.toString())
+                tempPokeMutableList.add(pokemon!!)
+            }
+        }
+        list = tempPokeMutableList
+
         //Log.d("taille liste", list.toString())
-        mPokedexAdapter = PokedexAdapter(list,this)
+        mPokedexAdapter = PokedexAdapter(list,requireContext())
         rvPoke!!.adapter = mPokedexAdapter
         rvPoke!!.setHasFixedSize(true)
-        val layoutManager = GridLayoutManager(this, 3)
+        val layoutManager = GridLayoutManager(requireContext(), 3)
         rvPoke!!.layoutManager = layoutManager
 
         return view

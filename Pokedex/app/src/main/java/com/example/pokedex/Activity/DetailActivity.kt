@@ -10,16 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.room.Room
 import com.example.pokedex.Api.PokemonService
-import com.example.pokedex.Dao.DetailsDao
-import com.example.pokedex.Dao.PokeDatabase
-import com.example.pokedex.Dao.SpeciesDao
-import com.example.pokedex.Models.DetailsPoke
-import com.example.pokedex.Models.PokemonSpecies
+import com.example.pokedex.Dao.*
+import com.example.pokedex.Models.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import com.example.pokedex.R
+import kotlinx.coroutines.android.awaitFrame
 import retrofit2.Callback
 import retrofit2.Response
 
@@ -33,11 +31,18 @@ class DetailActivity : AppCompatActivity() {
     private var mapType: HashMap<String, String> = HashMap()
     lateinit var detailsDao: DetailsDao
     lateinit var speciesDao: SpeciesDao
+    lateinit var pokemonDao: PokemonDao
+    lateinit var evolutionDao: EvolutionDao
     var details : DetailsPoke? = null
+    private var species : PokemonSpecies? = null
+    var pokemon : Pokemon? = null
+    private var evolution : EvolutionPokemon? = null
     var reponseDetailsDone : Boolean = false
     var reponseSpeciesDone : Boolean = false
+    var reponseEvolutionDone : Boolean = false
+    var comptAttente = 0
 
-    private var species : PokemonSpecies? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +51,13 @@ class DetailActivity : AppCompatActivity() {
             .allowMainThreadQueries().build()
         detailsDao = db.datailsDao()
         speciesDao = db.speciesDao()
+        pokemonDao = db.pokemonDao()
+        evolutionDao = db.evolutionDao()
         bottomNav = findViewById<View>(R.id.bottom_navigation) as BottomNavigationView
         bottomNav!!.setOnNavigationItemSelectedListener(listener)
         val pokeIntent = intent.extras
         val pokeId = pokeIntent!!.getInt("id")
+        evolution = chercherEvolution(id = pokeId)
         species = chercherSpecies(id = pokeId)
         details = chercherDetails(id = pokeId)
     }
@@ -90,7 +98,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
 
-    fun chercherDetails(id: Int): DetailsPoke? {
+    private fun chercherDetails(id: Int): DetailsPoke {
         val pokemonService: PokemonService = Retrofit.Builder()
             .baseUrl(PokemonService.URLList)
             .addConverterFactory(GsonConverterFactory.create())
@@ -99,7 +107,6 @@ class DetailActivity : AppCompatActivity() {
         pokemonService.getDetails(id.toString())?.enqueue(object : Callback<DetailsPoke?> {
             override fun onResponse(call: Call<DetailsPoke?>?, response: Response<DetailsPoke?>) {
                 if (response.isSuccessful) {
-                    reponseDetailsDone = true
                     val detailsPoke: DetailsPoke = response.body()!!
 //                    Log.e("check Types", detailsPoke.types[0].type?.name.toString())
                     detailsPoke.type1 = detailsPoke.types[0].type?.name
@@ -116,8 +123,9 @@ class DetailActivity : AppCompatActivity() {
                     detailsDao.insertDetails(detailsPoke)
 
                     details = detailsDao.findDetailsByID(id)
+                    reponseDetailsDone = true
                     Log.e("Check in table", details?.type1.toString())
-                    if(reponseDetailsDone && reponseSpeciesDone){
+                    if(reponseDetailsDone && reponseSpeciesDone && reponseEvolutionDone){
                         pokeDetail(id)
                     }
 
@@ -154,7 +162,6 @@ class DetailActivity : AppCompatActivity() {
                     var tempText: String? = ""
                     //var tempLang: String? = ""
                     var tempNames: String? = ""
-                    reponseSpeciesDone = true
 
                     val iterator = speciesPoke.flavor_text_entries?.iterator()
 
@@ -175,7 +182,8 @@ class DetailActivity : AppCompatActivity() {
 
 
                     speciesDao.insertSpecies(speciesPoke)
-                    if(reponseDetailsDone && reponseSpeciesDone){
+                    reponseSpeciesDone = true
+                    if(reponseDetailsDone && reponseSpeciesDone && reponseEvolutionDone){
                         pokeDetail(id)
                     }
                 }
@@ -187,6 +195,94 @@ class DetailActivity : AppCompatActivity() {
        // Log.e("sortie detail","failure Species")
         return speciesDao.findSpeciesByID(id)
     }
+
+
+    private fun chercherEvolution(id: Int) : EvolutionPokemon{
+        val evolutionService: PokemonService = Retrofit.Builder()
+            .baseUrl(PokemonService.URLEvo)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(PokemonService::class.java)
+
+        evolutionService.getEvolutions(id.toString()).enqueue(object : Callback<List<EvolutionPokemon?>?>{
+            override fun onResponse(
+                call: Call<List<EvolutionPokemon?>?>,
+                response: Response<List<EvolutionPokemon?>?>
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("Check Evoution", "entre evo")
+
+                    val evolutionPokemon : EvolutionPokemon = response.body()?.get(0)!!
+
+                    var tempfamily = ""
+                    val templist = mutableListOf("")
+                    templist.remove("")
+                    evolutionPokemon.family?.evolutionLine?.forEach {
+                        val split : List<String> = it.split("/")
+                        split. forEach { it1 ->
+                            if(it1 != evolutionPokemon.name) {
+                                templist.add(it1)
+                            }
+                        }
+                    }
+                    templist.forEach{
+                        tempfamily = "$tempfamily$it/"
+                        pokemon = pokemonDao.findByName(it)
+
+                        if (pokemon == null){
+                            chercherPokemon(it)
+                            comptAttente ++
+                        }
+                    }
+                    while (comptAttente != 0){
+                        Thread.sleep(10)
+                        Log.e("Nombre en attente", comptAttente.toString())
+                    }
+                    evolutionPokemon.familyList = tempfamily
+                    evolutionDao.insertEvolution(evolutionPokemon)
+
+
+                    Log.e("Check Evoution", "arriver fin evo")
+                    reponseEvolutionDone = true
+                    if(reponseDetailsDone && reponseSpeciesDone && reponseEvolutionDone){
+                        pokeDetail(id)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<List<EvolutionPokemon?>?>, t: Throwable) {
+                Log.e("Check Evoution", "Fail evo")
+                Log.e("Check evo fail", t.cause.toString())
+
+            }
+
+
+        })
+        return evolutionDao.findEvolutionByID(id)
+    }
+
+    private fun chercherPokemon(name : String){
+        val pokemonService: PokemonService = Retrofit.Builder()
+            .baseUrl(PokemonService.URLList)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(PokemonService::class.java)
+        pokemonService.getPokemonByName(name)?.enqueue(object : Callback<Pokemon?>{
+            override fun onResponse(call: Call<Pokemon?>?, response: Response<Pokemon?>) {
+                if (response.isSuccessful) {
+                    Log.e("ENtrer chercher pokemon", "Entreeeeeeeeeeeeeeeeer")
+
+                    val pokemon: Pokemon = response.body()!!
+                    pokemonDao.insertAll(pokemon)
+                    comptAttente--
+                }
+            }
+            override fun onFailure(call: Call<Pokemon?>?, t: Throwable?) {
+                Log.e("Failure chercher pokemon", "Faiiiiiiiiiiil")
+            }
+        })
+    }
+
     private fun makeMapType() {
         mapType["bug"] = "#A8B820"
         mapType["dragon"] = "#7038F8"

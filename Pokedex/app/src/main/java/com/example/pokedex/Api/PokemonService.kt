@@ -1,10 +1,7 @@
 package com.example.pokedex.Api
 
 import androidx.room.Dao
-import com.example.pokedex.Models.AllPokemon
-import com.example.pokedex.Models.DetailsPoke
-import com.example.pokedex.Models.EvolutionPokemon
-import com.example.pokedex.Models.PokemonSpecies
+import com.example.pokedex.Models.*
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -16,6 +13,9 @@ interface PokemonService {
     @GET("pokemon/")
     fun getPokemon(@Query("limit") limit: Int, @Query("offset") offset: Int): Call<AllPokemon?>?
 
+    @GET("pokemon/{pokemonName}")
+    fun getPokemonByName(@Path("pokemonName") name: String): Call<Pokemon?>?
+
     @GET("pokemon/{pokemonID}")
     fun getDetails(@Path("pokemonID") id: String): Call<DetailsPoke?>?
 
@@ -23,7 +23,7 @@ interface PokemonService {
     fun getPokemonSpecies(@Path("pokemonID") id: Int): Call<PokemonSpecies?>?
 
     @GET("pokemon/{pokemonID}")
-    fun getEvolutions(@Path("pokemonID") id: String) : Call<EvolutionPokemon?>?
+    fun getEvolutions(@Path("pokemonID") id: String) : Call<List<EvolutionPokemon?>?>
 
     companion object {
         const val URLList = "https://pokeapi.co/api/v2/"

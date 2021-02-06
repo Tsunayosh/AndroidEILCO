@@ -11,7 +11,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 class EvolutionPokemon : Parcelable{
     @PrimaryKey
-    var id : Int = 0
+    var number : Int = 0
 
     @ColumnInfo(name = "name")var name : String = ""
     @Ignore var family : Family? = null
